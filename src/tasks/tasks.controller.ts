@@ -22,11 +22,7 @@ export class TasksController {
 
   @Get()
   getTasks(@Query() filterDto: GetTasksFilterDto) {
-    if (Object.keys(filterDto).length) {
-      return this.tasksService.getTasksWithFilters(filterDto);
-    }
-
-    return this.tasksService.getAllTasks();
+    return this.tasksService.getTasks(filterDto);
   }
 
   @Get(':id')
@@ -42,7 +38,7 @@ export class TasksController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteTask(@Param('id') id: string) {
-    this.tasksService.deleteTask(id);
+    return this.tasksService.deleteTask(id);
   }
 
   @Patch(':id/status')
