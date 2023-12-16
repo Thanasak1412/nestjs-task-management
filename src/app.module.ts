@@ -2,15 +2,27 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AuthModule } from './auth/auth.module';
+import {
+  configValidationAppSchema,
+  configValidationDbSchema,
+} from './config/config.schema';
 import configuration from './config/configuration';
 import { TasksModule } from './tasks/tasks.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      validationSchema: configValidationAppSchema,
+      load: [configuration],
+    }),
     TasksModule,
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule.forRoot({ load: [configuration] })],
+      imports: [
+        ConfigModule.forRoot({
+          validationSchema: configValidationDbSchema,
+        }),
+      ],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
