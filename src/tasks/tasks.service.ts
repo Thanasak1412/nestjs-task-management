@@ -43,18 +43,6 @@ export class TasksService {
     return task;
   }
 
-  // createTask(createTaskDto: CreateTaskDto): Task {
-  //   const { title, description } = createTaskDto;
-  //   const task = {
-  //     id: uuidv4(),
-  //     title,
-  //     description,
-  //     status: TaskStatus.OPEN,
-  //   };
-  //   this.tasks.push(task);
-  //   return task;
-  // }
-
   createTask(createTaskDto: CreateTaskDto) {
     return this.taskRepository.createTask(createTaskDto);
   }
