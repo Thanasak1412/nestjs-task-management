@@ -1,6 +1,11 @@
 import { User } from 'src/auth/user.entity';
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
@@ -10,12 +15,25 @@ import { TaskRepository } from './task.repository';
 
 @Injectable()
 export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
   constructor(private readonly taskRepository: TaskRepository) {}
 
   async getTasks(filterDto: GetTasksFilterDto, user: User) {
-    const tasks = await this.taskRepository.getTasks(filterDto, user);
+    try {
+      const tasks = await this.taskRepository.getTasks(filterDto, user);
 
-    return tasks;
+      return tasks;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get tasks by ${user.username}, to filter by ${JSON.stringify(
+          filterDto,
+        )}`,
+        error.stack,
+      );
+
+      throw new InternalServerErrorException();
+    }
   }
 
   async getTaskById(id: string, user: User): Promise<Task> {
@@ -49,8 +67,17 @@ export class TasksService {
 
     task.status = status;
 
-    await this.taskRepository.save(task);
+    try {
+      await this.taskRepository.save(task);
 
-    return task;
+      return task;
+    } catch (error) {
+      this.logger.error(
+        `Failed to update tasks by user: ${user.username}`,
+        error.stack,
+      );
+
+      throw new InternalServerErrorException();
+    }
   }
 }
