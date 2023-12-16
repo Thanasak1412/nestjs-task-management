@@ -2,6 +2,10 @@ export default () => ({
   app: {
     port: process.env.APP_PORT,
   },
+  auth: {
+    jwtSecret: process.env.JWT_SECRET,
+    jwtExpired: process.env.JWT_EXPIRED,
+  },
   database: {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
