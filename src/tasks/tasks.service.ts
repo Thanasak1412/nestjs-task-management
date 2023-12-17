@@ -79,4 +79,37 @@ export class TasksService {
       throw new InternalServerErrorException();
     }
   }
+
+  async uploadTasks(fileContents: string[], user: User) {
+    const isSuccess = fileContents.every(async (line) => {
+      const lines = line.trim().split(',');
+
+      const nonEmptyLines = lines.filter((item) => item.trim());
+
+      if (Array.isArray(nonEmptyLines) && nonEmptyLines.length) {
+        const [title, description] = nonEmptyLines;
+        const createTaskDto: CreateTaskDto = { title, description };
+
+        try {
+          const task = await this.taskRepository.createTask(
+            createTaskDto,
+            user,
+          );
+
+          if (task) {
+            return true;
+          }
+        } catch (error) {
+          this.logger.error(
+            `Failed to upload tasks by user: ${user.username}`,
+            error.stack,
+          );
+
+          throw new InternalServerErrorException();
+        }
+      }
+    });
+
+    return { message: 'Successful', status: isSuccess };
+  }
 }
