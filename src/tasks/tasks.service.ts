@@ -80,7 +80,9 @@ export class TasksService {
     }
   }
 
-  async uploadTasks(fileContents: string[], user: User) {
+  async uploadTasks(file: Express.Multer.File, user: User) {
+    const fileContents = file.buffer.toString('utf8').split('\n');
+
     const isSuccess = fileContents.every(async (line) => {
       const lines = line.trim().split(',');
 

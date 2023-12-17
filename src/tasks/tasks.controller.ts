@@ -66,8 +66,6 @@ export class TasksController {
     @UploadedFile() file: Express.Multer.File,
     @GetUser() user: User,
   ) {
-    const fileContents = file.buffer.toString('utf8').split('\n');
-
-    return this.tasksService.uploadTasks(fileContents, user);
+    return this.tasksService.uploadTasks(file, user);
   }
 }
