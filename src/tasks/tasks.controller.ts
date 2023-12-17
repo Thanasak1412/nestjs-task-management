@@ -9,9 +9,12 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '../auth/user.entity';
@@ -55,5 +58,16 @@ export class TasksController {
     const { status } = updateTaskStatusDto;
 
     return this.tasksService.updateTaskStatus(id, status, user);
+  }
+
+  @Post('/upload')
+  @UseInterceptors(FileInterceptor('tasks'))
+  uploadTasks(
+    @UploadedFile() file: Express.Multer.File,
+    @GetUser() user: User,
+  ) {
+    const fileContents = file.buffer.toString('utf8').split('\n');
+
+    return this.tasksService.uploadTasks(fileContents, user);
   }
 }
